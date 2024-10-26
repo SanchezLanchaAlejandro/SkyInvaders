@@ -9,7 +9,7 @@ class Enemy(pygame.sprite.Sprite):
         player_width = 99
         self.rect.x = random.randint(player_width // 2, 1050 - (player_width // 2 + self.rect.width))  # Posición aleatoria en X
         self.rect.y = random.randint(-100, -40)  # Aparece fuera de la pantalla
-        self.speed = random.randint(1, 5)  # Aumentamos la velocidad mínima
+        self.speed = random.randint(1, 4)  # Aumentamos la velocidad mínima
 
     def update(self):
         self.rect.y += self.speed  # Mover el enemigo hacia abajo
