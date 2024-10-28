@@ -14,6 +14,9 @@ pygame.display.set_caption("Sky Guardians")
 
 background = pygame.image.load("assets/images/background.png")
 background = pygame.transform.scale(background, (width, height))
+heart = pygame.image.load("assets/images/heart.png")
+heart= pygame.transform.scale(heart, (50, 50))
+heart.set_colorkey((255, 255, 255))
 
 # Fuentes
 font = pygame.font.Font(None, 74)
@@ -26,6 +29,7 @@ level1_duration = 30 * 1000
 # Variables globales
 enemy_shoot_interval = 2000
 last_enemy_shot_time = pygame.time.get_ticks()
+player_lives = 3
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, True, color)
@@ -68,18 +72,23 @@ def show_game_over_screen():
 
 def reset_game():
     # Crear y configurar los objetos del juego de nuevo
-    global player, missiles, enemies, start_time, tiempo_misil, missiles_enemy, enemy_shoot_interval, last_enemy_shot_time
-    player = Player(width // 2, height)             # Reiniciar posición del jugador
-    missiles = pygame.sprite.Group()                # Vaciar el grupo de misiles
-    missiles_enemy = pygame.sprite.Group()          # Vaciar el grupo de misiles
-    enemies = pygame.sprite.Group()                 # Vaciar el grupo de enemigos
-    start_time = pygame.time.get_ticks()            # Reiniciar el temporizador
-    tiempo_misil = time.time()                      # Reiniciar el tiempo para los misiles
-    enemy_shoot_interval = 2000                     # Reiniciar intervalo de disparo enemigo
-    last_enemy_shot_time = pygame.time.get_ticks()  # Reiniciar tiempo del último disparo enemigo
+    global player, missiles, enemies, start_time, tiempo_misil, missiles_enemy, enemy_shoot_interval, last_enemy_shot_time, player_lives
+    player = Player(width // 2, height)
+    missiles = pygame.sprite.Group()
+    missiles_enemy = pygame.sprite.Group()
+    enemies = pygame.sprite.Group()
+    start_time = pygame.time.get_ticks()
+    tiempo_misil = time.time()
+    enemy_shoot_interval = 2000
+    last_enemy_shot_time = pygame.time.get_ticks()
+    player_lives = 3
+
+def draw_lives(screen, lives, image):
+    for i in range(lives):
+        screen.blit(image, (10 + i * 40, 10))
 
 def main_game():
-    global start_time, tiempo_misil, last_enemy_shot_time
+    global start_time, tiempo_misil, last_enemy_shot_time, player_lives, heart
     reset_game()
     start_time = pygame.time.get_ticks()
     running = True
@@ -137,7 +146,10 @@ def main_game():
 
         # Colisiones entre misiles enemigos y el jugador
         if pygame.sprite.spritecollide(player, missiles_enemy, True):
-            game_over = True
+            player.hit()
+            player_lives -= 1
+            if player_lives <= 0:
+                game_over = True
 
         # Calcular el tiempo transcurrido
         elapsed_time = (pygame.time.get_ticks() - start_time) / 1000
@@ -150,9 +162,10 @@ def main_game():
         enemies.draw(screen)
         missiles_enemy.draw(screen)
 
-        # Dibujar el temporizador
+        # Dibujar el temporizador y vidas
         timer_text = small_font.render(f'Tiempo: {int(remaining_time)}s', True, (255, 255, 255))
         screen.blit(timer_text, (900, 10))
+        draw_lives(screen, player_lives, heart)
 
         # Actualización pantalla
         pygame.display.flip()
