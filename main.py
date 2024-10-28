@@ -6,17 +6,24 @@ from missile_enemy import EnemyMissile
 
 # Inicialización pygame
 pygame.init()
+pygame.mixer.init()
 
 # Configuración de la pantalla
 width, height = 1050, 800
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Sky Guardians")
 
+# Imagenes
 background = pygame.image.load("assets/images/background.png")
 background = pygame.transform.scale(background, (width, height))
 heart = pygame.image.load("assets/images/heart.png")
 heart= pygame.transform.scale(heart, (50, 50))
 heart.set_colorkey((255, 255, 255))
+
+# Sonidos
+sonido_jugador = pygame.mixer.Sound("assets/tirPlayer.wav")
+sonido_enemigo = pygame.mixer.Sound("assets/tirEnemy.wav")
+sonido_golpe = pygame.mixer.Sound("assets/uuhhh.mp3")
 
 # Fuentes
 font = pygame.font.Font(None, 74)
@@ -44,6 +51,10 @@ def show_start_screen():
     draw_text('Pulsa ENTER para iniciar', small_font, (255, 255, 255), screen, width // 2, height // 2 + 50)
     pygame.display.flip()
 
+    pygame.mixer.music.load("assets/menu.wav")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(1)
+
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -54,11 +65,15 @@ def show_start_screen():
                 if event.key == pygame.K_RETURN:
                     waiting = False
 
+
+
 def show_game_over_screen():
     screen.blit(background, (0, 0))
     draw_text('¡Game Over!', font, (255, 0, 0), screen, width // 2, height // 2 - 50)
     draw_text('Pulsa ENTER para reiniciar', small_font, (255, 255, 255), screen, width // 2, height // 2 + 50)
     pygame.display.flip()
+    pygame.mixer.music.load("assets/gameOver.mp3")
+    pygame.mixer.music.play(0)
 
     waiting = True
     while waiting:
@@ -94,6 +109,9 @@ def main_game():
     running = True
     game_over = False
 
+    pygame.mixer.music.load("assets/battle.wav")
+    pygame.mixer.music.play(-1)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -109,6 +127,7 @@ def main_game():
             if time.time() - tiempo_misil > 0.3:
                 missile = Missile(player.rect.centerx, player.rect.top)
                 missiles.add(missile)
+                sonido_jugador.play()
                 tiempo_misil = time.time()
 
         # Disparo aleatorio de enemigos
@@ -118,6 +137,7 @@ def main_game():
                 random_enemy = random.choice(enemies.sprites())  # Elegir enemigo aleatorio
                 enemy_missile = EnemyMissile(random_enemy.rect.centerx, random_enemy.rect.bottom)
                 missiles_enemy.add(enemy_missile)
+                sonido_enemigo.play()
                 last_enemy_shot_time = current_time
 
         # Actualización misiles
@@ -148,6 +168,7 @@ def main_game():
         if pygame.sprite.spritecollide(player, missiles_enemy, True):
             player.hit()
             player_lives -= 1
+            sonido_golpe.play()
             if player_lives <= 0:
                 game_over = True
 
