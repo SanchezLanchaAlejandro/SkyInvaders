@@ -26,7 +26,7 @@ sonido_enemigo = pygame.mixer.Sound("assets/tirEnemy.wav")
 sonido_golpe = pygame.mixer.Sound("assets/uuhhh.mp3")
 
 # Fuentes
-font = pygame.font.Font(None, 74)
+font = pygame.font.Font("assets/EuropeanTeletext.ttf", 74)
 small_font = pygame.font.Font(None, 36)
 
 # Temporizador para niveles
