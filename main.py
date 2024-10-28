@@ -85,6 +85,25 @@ def show_game_over_screen():
                 if event.key == pygame.K_RETURN:
                     waiting = False
 
+def show_level_completed_screen():
+    screen.blit(background, (0, 0))
+    draw_text('¡Nivel Conseguido!', font, (0, 255, 0), screen, width // 2, height // 2 - 50)  # Texto en verde
+    draw_text('Pulsa ENTER para continuar', small_font, (255, 255, 255), screen, width // 2, height // 2 + 50)
+    pygame.display.flip()
+
+    pygame.mixer.music.load("assets/levelCompleted.mp3")
+    pygame.mixer.music.play(0)
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    waiting = False
+
 def reset_game():
     # Crear y configurar los objetos del juego de nuevo
     global player, missiles, enemies, start_time, tiempo_misil, missiles_enemy, enemy_shoot_interval, last_enemy_shot_time, player_lives
@@ -192,7 +211,10 @@ def main_game():
         pygame.display.flip()
 
         # Verificar si el tiempo se ha agotado
-        if remaining_time <= 0 or game_over:
+        if remaining_time <= 0:
+            show_level_completed_screen()
+            running = False
+        if game_over:
             show_game_over_screen()
             running = False
 
